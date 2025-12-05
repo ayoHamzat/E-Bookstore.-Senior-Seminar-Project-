@@ -11,10 +11,10 @@ const AddBook = () => {
     const [addBook, {isLoading, isError}] = useAddBookMutation()
     const [imageFileName, setimageFileName] = useState('')
     const onSubmit = async (data) => {
- 
+    console.log(data)
         const newBookData = {
             ...data,
-            coverImage: imageFileName
+            imageFile
         }
         try {
             await addBook(newBookData).unwrap();

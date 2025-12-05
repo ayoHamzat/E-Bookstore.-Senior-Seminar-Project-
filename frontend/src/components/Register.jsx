@@ -20,6 +20,7 @@ const Register = () => {
       const onSubmit = async(data) => {
         // console.log(data)
         try {
+            console.log(data.email, data.password);
             await registerUser(data.email, data.password);
             alert("User registered successfully!")
         } catch (error) {

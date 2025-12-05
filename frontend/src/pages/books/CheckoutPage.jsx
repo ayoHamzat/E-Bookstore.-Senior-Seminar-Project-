@@ -56,6 +56,39 @@ const CheckoutPage = () => {
             alert("Failed to place an order")
         }
     }
+    const handleStripePayment = async () => {
+    try {
+        const response = await fetch("http://localhost:5000/api/payments/create-checkout-session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                cartItems,
+                customerInfo: {
+                    name: watch("name"),
+                    email: currentUser?.email,
+                    phone: watch("phone"),
+                    city: watch("city"),
+                    country: watch("country"),
+                    state: watch("state"),
+                    zipcode: watch("zipcode")
+                }
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.url) {
+            window.location.href = data.url;   // Redirect to Stripe Checkout
+        } else {
+            Swal.fire("Error", "Could not start Stripe checkout.", "error");
+        }
+
+    } catch (error) {
+        console.error("Stripe Checkout Error:", error);
+        Swal.fire("Error", "Stripe payment failed.", "error");
+    }
+};
+
 
     if(isLoading) return <div>Loading....</div>
     return (
@@ -175,6 +208,15 @@ const CheckoutPage = () => {
                                                     <button
                                                         disabled={!isChecked}
                                                         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Place an Order</button>
+                                                    <button
+                                                        type="button"
+                                                        disabled={!isChecked}
+                                                        onClick={handleStripePayment}
+                                                        className="bg-purple-600 hover:bg-purple-800 text-white font-bold py-2 px-4 rounded ml-4"
+                                                    >
+                                                        Pay with Stripe
+                                                    </button>
+
                                                 </div>
                                             </div>
 

@@ -2,7 +2,17 @@ const Book = require("./book.model");
 
 const postABook = async (req, res) => {
     try {
-        const newBook = await Book({...req.body});
+        let coverImage = null;
+console.log("image", req.body.image)
+    if (req.file) {
+      // e.g. http://localhost:5000/uploads/yourfile.png
+      coverImage = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
+    }
+
+    const newBook = new Book({
+      ...req.body,
+      coverImage, // will be null if no file uploaded
+    });
         await newBook.save();
         res.status(200).send({message: "Book posted successfully", book: newBook})
     } catch (error) {

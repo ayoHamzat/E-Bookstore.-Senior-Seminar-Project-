@@ -6,6 +6,7 @@ const  baseQuery = fetchBaseQuery({
     credentials: 'include',
     prepareHeaders: (Headers) => {
         const token =  localStorage.getItem('token');
+        console.log(token)
         if(token) {
             Headers.set('Authorization', `Bearer ${token}`);
         }
@@ -27,11 +28,30 @@ const booksApi = createApi({
             providesTags: (result, error, id) => [{ type: "Books", id }],
         }),
         addBook: builder.mutation({
-            query: (newBook) => ({
-                url: `/create-book`,
-                method: "POST",
-                body: newBook
-            }),
+            query: (newBook) => {const formData = new FormData();
+
+    formData.append("title", newBook.title);
+    formData.append("category", newBook.category);
+    formData.append("description", newBook.description);
+    formData.append("trending", newBook.trending);
+    formData.append("oldPrice", newBook.oldPrice);
+    formData.append("newPrice", newBook.newPrice);
+
+
+
+
+    // VERY IMPORTANT: 'image' must match `upload.single("image")` on backend
+    if (newBook.imageFile) {
+        console.log(newBook.imageFile)
+      formData.append("image", newBook.imageFile);
+    }
+
+    return {
+      url: `/create-book`,
+      method: "POST",
+      body: formData,
+      // don't set Content-Type manually; the browser will set multipart boundary
+    };},
             invalidatesTags: ["Books"]
         }),
         updateBook: builder.mutation({
